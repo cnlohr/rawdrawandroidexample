@@ -1,6 +1,8 @@
 # rawdrawandroidexample
 
-Example app using rawdrawandroid as a submodule.
+Example app using rawdrawandroid as a submodule.  Check out rawdrawandroid here:
+
+https://github.com/cnlohr/rawdrawandroid
 
 Starting from no folder at all:
 ```
