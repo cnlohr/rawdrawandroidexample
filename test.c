@@ -121,6 +121,7 @@ int main()
 
 		// Mesh in background
 		CNFGColor( 0xffffff );
+		CNFGPenX = 20; CNFGPenY = 900;
 		CNFGDrawText( assettext, 15 );
 		void FlushRender();
 		FlushRender();
@@ -181,11 +182,6 @@ int main()
 			linesegs = 0;
 			LastFPSTime+=1;
 		}
-
-		SecToWait = .016 - ( ThisTime - LastFrameTime );
-		LastFrameTime += .016;
-		if( SecToWait > 0 )
-			OGUSleep( (int)( SecToWait * 1000000 ) );
 	}
 
 	return(0);
