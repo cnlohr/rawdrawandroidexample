@@ -6,9 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "CNFGFunctions.h"
 #include "os_generic.h"
-#include "CNFG3D.h"
 #include <GLES3/gl3.h>
 #include <asset_manager.h>
 #include <asset_manager_jni.h>
@@ -16,6 +14,10 @@
 #include <android/log.h>
 #include <android/sensor.h>
 #include "CNFGAndroid.h"
+
+#define CNFG3D
+#define CNFG_IMPLEMENTATION
+#include "CNFG.h"
 
 #define KTAG( x ) #x
 static const char* kTAG = KTAG(APPNAME);
@@ -124,8 +126,7 @@ int main()
 		CNFGColor( 0xffffff );
 		CNFGPenX = 20; CNFGPenY = 900;
 		CNFGDrawText( assettext, 15 );
-		void FlushRender();
-		FlushRender();
+		CNFGFlushRender();
 
 		CNFGPenX = 0; CNFGPenY = 480;
 		char st[50];
