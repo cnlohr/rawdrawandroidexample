@@ -95,6 +95,7 @@ void HandleKey( int keycode, int bDown )
 {
 	lastkey = keycode;
 	lastkeydown = bDown;
+	if( keycode == 4 ) { AndroidSendToBack( 1 ); }
 }
 
 void HandleButton( int x, int y, int button, int bDown )
