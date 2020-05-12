@@ -19,15 +19,65 @@
 #define CNFG_IMPLEMENTATION
 #include "CNFG.h"
 
-#define KTAG( x ) #x
-static const char* kTAG = KTAG(APPNAME);
-#define LOGI(...)  ((void)__android_log_print(ANDROID_LOG_INFO, kTAG, __VA_ARGS__))
-#define printf( x...) LOGI( x )
-
 unsigned frames = 0;
 unsigned long iframeno = 0;
 
-void AndroidDisplayKeyboard(int pShow);
+
+#define GENLINEWIDTH 89
+#define GENLINES 67
+
+int genlinelen = 0;
+char genlog[(GENLINEWIDTH+1)*(GENLINES+1)+2] = "log";
+int genloglen;
+int genloglines;
+int firstnewline = -1;
+
+void example_log_function( int readSize, char * buf )
+{
+	static og_mutex_t * mt;
+	if( !mt ) mt = OGCreateMutex();
+	OGLockMutex( mt );
+	int i;
+	for( i = 0; (readSize>=0)?(i <= readSize):buf[i]; i++ )
+	{
+		char c = buf[i];
+		if( c == '\0' ) c = '\n';
+		if( ( c != '\n' && genlinelen >= GENLINEWIDTH ) || c == '\n' )
+		{
+			int k;
+			genloglines++;
+			if( genloglines >= GENLINES )
+			{
+				genloglen -= firstnewline+1;
+				int offset = firstnewline;
+				firstnewline = -1;
+
+				for( k = 0; k < genloglen; k++ )
+				{
+					if( ( genlog[k] = genlog[k+offset+1] ) == '\n' && firstnewline < 0)
+					{
+						firstnewline = k;
+					}
+				}
+				genlog[k] = 0;
+				genloglines--;
+			}
+			genlinelen = 0;
+			if( c != '\n' )
+			{
+				genlog[genloglen+1] = 0;
+				genlog[genloglen++] = '\n';
+			}
+			if( firstnewline < 0 ) firstnewline = genloglen;
+		}
+		genlog[genloglen+1] = 0;
+		genlog[genloglen++] = c;
+		if( c != '\n' ) genlinelen++;
+	}
+
+	OGUnlockMutex( mt );
+}
+
 volatile int suspended;
 
 short screenx, screeny;
@@ -45,7 +95,6 @@ void HandleKey( int keycode, int bDown )
 {
 	lastkey = keycode;
 	lastkeydown = bDown;
-	if( keycode == 10 && !bDown ) { keyboard_up = 0; AndroidDisplayKeyboard( keyboard_up );  }
 }
 
 void HandleButton( int x, int y, int button, int bDown )
@@ -53,8 +102,6 @@ void HandleButton( int x, int y, int button, int bDown )
 	lastbid = button;
 	lastbuttonx = x;
 	lastbuttony = y;
-
-	if( bDown ) { keyboard_up = !keyboard_up; AndroidDisplayKeyboard( keyboard_up ); }
 }
 
 void HandleMotion( int x, int y, int mask )
@@ -69,8 +116,6 @@ extern struct android_app * gapp;
 
 void HandleDestroy()
 {
-	printf( "Destroying\n" );
-	exit(10);
 }
 
 void HandleSuspend()
@@ -124,8 +169,8 @@ int main()
 
 		// Mesh in background
 		CNFGColor( 0xffffff );
-		CNFGPenX = 20; CNFGPenY = 900;
-		CNFGDrawText( assettext, 15 );
+		CNFGPenX = 20; CNFGPenY = 20;
+		CNFGDrawText( assettext, 10 );
 		CNFGFlushRender();
 
 		CNFGPenX = 0; CNFGPenY = 480;
@@ -165,13 +210,17 @@ int main()
 			RDPoint pp[3];
 			CNFGColor( 0x00FF00 );
 			pp[0].x = (short)(50*sin((float)(i+iframeno)*.01) + (i%20)*30);
-			pp[0].y = (short)(50*cos((float)(i+iframeno)*.01) + (i/20)*20)+700;
+			pp[0].y = (short)(50*cos((float)(i+iframeno)*.01) + (i/20)*20);
 			pp[1].x = (short)(20*sin((float)(i+iframeno)*.01) + (i%20)*30);
-			pp[1].y = (short)(50*cos((float)(i+iframeno)*.01) + (i/20)*20)+700;
+			pp[1].y = (short)(50*cos((float)(i+iframeno)*.01) + (i/20)*20);
 			pp[2].x = (short)(10*sin((float)(i+iframeno)*.01) + (i%20)*30);
-			pp[2].y = (short)(30*cos((float)(i+iframeno)*.01) + (i/20)*20)+700;
+			pp[2].y = (short)(30*cos((float)(i+iframeno)*.01) + (i/20)*20);
 			CNFGTackPoly( pp, 3 );
 		}
+
+		CNFGPenX = 5;
+		CNFGPenY = 600;
+		CNFGDrawText( genlog, 4 );
 
 		frames++;
 		CNFGSwapBuffers();
