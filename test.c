@@ -138,12 +138,11 @@ int main()
 	double SecToWait;
 	int linesegs = 0;
 
-	CNFGBGColor = 0x400000;
-	CNFGDialogColor = 0x444444;
+	CNFGBGColor = 0x400000ff;
 	CNFGSetupFullscreen( "Test Bench", 0 );
 
 	const char * assettext = "Not Found";
-	AAsset * file = AAssetManager_open( gapp->activity->assetManager, "asset.txt", AASSET_MODE_BUFFER );
+	AAsset * file = AAssetManager_open( gapp->activity->assetManager, "test.txt", AASSET_MODE_BUFFER );
 	if( file )
 	{
 		size_t fileLength = AAsset_getLength(file);
@@ -165,11 +164,11 @@ int main()
 		if( suspended ) { usleep(50000); continue; }
 
 		CNFGClearFrame();
-		CNFGColor( 0xFFFFFF );
+		CNFGColor( 0xffffffff );
 		CNFGGetDimensions( &screenx, &screeny );
 
 		// Mesh in background
-		CNFGColor( 0xffffff );
+		CNFGColor( 0xffffffff );
 		CNFGPenX = 20; CNFGPenY = 20;
 		CNFGDrawText( assettext, 10 );
 		CNFGFlushRender();
@@ -181,13 +180,14 @@ int main()
 		glLineWidth( 2.0 );
 
 		// Square behind text
-		CNFGDrawBox( 600, 0, 950, 350);
+		CNFGBGColor = 0x444444ff;
+		CNFGTackRectangle( 600, 0, 950, 350);
 
 		CNFGPenX = 10; CNFGPenY = 10;
 
 		// Text
 		pos = 0;
-		CNFGColor( 0xffffff );
+		CNFGColor( 0xffffffff );
 		for( i = 0; i < 1; i++ )
 		{
 			int c;
@@ -209,7 +209,7 @@ int main()
 		for( i = 0; i < 400; i++ )
 		{
 			RDPoint pp[3];
-			CNFGColor( 0x00FF00 );
+			CNFGColor( 0x00ff00ff );
 			pp[0].x = (short)(50*sin((float)(i+iframeno)*.01) + (i%20)*30);
 			pp[0].y = (short)(50*cos((float)(i+iframeno)*.01) + (i/20)*20);
 			pp[1].x = (short)(20*sin((float)(i+iframeno)*.01) + (i%20)*30);
