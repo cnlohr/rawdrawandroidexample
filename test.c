@@ -142,7 +142,7 @@ int main()
 	CNFGSetupFullscreen( "Test Bench", 0 );
 
 	const char * assettext = "Not Found";
-	AAsset * file = AAssetManager_open( gapp->activity->assetManager, "test.txt", AASSET_MODE_BUFFER );
+	AAsset * file = AAssetManager_open( gapp->activity->assetManager, "asset.txt", AASSET_MODE_BUFFER );
 	if( file )
 	{
 		size_t fileLength = AAsset_getLength(file);
